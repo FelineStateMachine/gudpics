@@ -243,7 +243,7 @@ input[type=range]::-moz-range-thumb { width: 26px; height: 26px; border: 0; bord
 .chip-btn:active:not(:disabled) { opacity: .7; }
 .tool[data-state="empty"] .chips { opacity: .4; }
 .chips-sticky { position: relative; padding-right: 0; }
-.chip-list { display: flex; gap: 8px; align-items: center; padding-right: 8px; }
+.chip-list { display: flex; gap: 8px; align-items: center; padding-right: 56px; }
 .chip-group { flex: none; font-size: 12px; color: var(--label-2); padding: 0 2px 0 8px; }
 .chip-pin { position: sticky; right: 0; margin-left: auto; width: 44px; padding: 0; display: grid; place-items: center; box-shadow: -14px 0 12px -6px var(--surface); }
 
