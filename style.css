@@ -68,8 +68,8 @@ h1, h2, h3, p { margin: 0; }
   transition: transform .12s, background .12s;
 }
 .tool-card:active { transform: scale(.97); background: var(--surface-2); }
-.tool-glyph { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 16px; background: var(--surface-2); color: var(--tint); margin-bottom: 18px; }
-.tool-glyph svg { width: 34px; height: 34px; }
+.tool-glyph { display: block; color: var(--tint); margin-bottom: 18px; }
+.tool-glyph svg { width: 48px; height: 48px; }
 .tool-card h2 { font-size: 17px; font-weight: 600; }
 .tool-card p { font-size: 13px; color: var(--label-2); margin-top: 3px; }
 
