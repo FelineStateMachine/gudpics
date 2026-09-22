@@ -23,7 +23,15 @@ const NEUTRAL_URLS={100:new URL('./assets/luts/neutral-dr100.png',import.meta.ur
 const FROM_CAMERA={'Provia':'provia','Velvia':'velvia','Astia':'astia','Classic Chrome':'classic_chrome','Pro Neg. Hi':'pro_neg_high','Pro Neg. Std':'pro_neg_std','Eterna':'eterna',
   'Acros':'acros','Acros+R':'acros-red','Acros+Ye':'acros-yellow','Acros+G':'acros-green','Monochrome':'mono','Monochrome+R':'mono-red','Monochrome+Ye':'mono-yellow','Monochrome+G':'mono-green','Sepia':'sepia'};
 
-const tool=$('tool'),canvas=$('canvas'),ctx=canvas.getContext('2d'),photo=$('photo');
+const tool=$('tool'),canvas=$('canvas'),ctx=canvas.getContext('2d'),photo=$('photo'),stageEl=$('stage');
+// Size the picture box to fit the stage, same for the developed canvas and the camera JPEG.
+function layout(){
+  const cs=getComputedStyle(stageEl),w=stageEl.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),h=stageEl.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  for(const [el,iw,ih] of [[canvas,canvas.width,canvas.height],[photo,photo.naturalWidth,photo.naturalHeight]]){
+    if(!iw||!ih)continue;const s=Math.min(w/iw,h/ih);el.style.width=Math.max(1,Math.floor(iw*s))+'px';el.style.height=Math.max(1,Math.floor(ih*s))+'px';
+  }
+}
+new ResizeObserver(layout).observe(stageEl);photo.addEventListener('load',layout);
 let current=null,busy=false,toastTimer,sim='provia',dr=100,showCamera=false,holdCamera=false,renderId=0,cameraUrl=null;
 const loaded=new Set(),loading=new Map();
 
@@ -54,7 +62,7 @@ async function render(){
     await Promise.all([ensureLut('neutral',dr,NEUTRAL_URLS[dr]||NEUTRAL_URLS[100]),ensureLut('sim',sim,LUT_URLS[sim])]);
     const r=await rpc('render',{dr:NEUTRAL_URLS[dr]?dr:100,sim});
     if(id!==renderId)return;
-    canvas.width=r.w;canvas.height=r.h;ctx.putImageData(new ImageData(r.data,r.w,r.h),0,0);
+    canvas.width=r.w;canvas.height=r.h;ctx.putImageData(new ImageData(r.data,r.w,r.h),0,0);layout();
   }catch(e){status(e.message,true);}
 }
 async function openFile(file){

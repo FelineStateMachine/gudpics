@@ -29,10 +29,17 @@ function syncControls(){
 function setBusy(value) {busy=value;$('busy').hidden=!value;syncControls();}
 function currentParams(){const s=Number($('strength').value)/100;return [Number($('rotation').value),base[1]*s,base[2]*s,base[3]*s];}
 function updateLabels(){const r=Number($('rotation').value);$('rotation-value').value=`${r>0?'+':''}${r.toFixed(2)}°`;$('strength-value').value=`${$('strength').value}%`;}
+// Size the canvas box to the picture inside the stage, so the overlay covers exactly the picture.
+function layout(){
+  if(!canvas.width)return;
+  const cs=getComputedStyle(stage),w=stage.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight),h=stage.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
+  const s=Math.min(w/canvas.width,h/canvas.height),cw=Math.max(1,Math.floor(canvas.width*s)),ch=Math.max(1,Math.floor(canvas.height*s));
+  canvas.style.width=overlay.style.width=cw+'px';canvas.style.height=overlay.style.height=ch+'px';
+}
 function draw(){
   const before=showBefore||holdBefore,source=before||!rendered?original:rendered;
   if(!source)return;
-  canvas.width=source.width;canvas.height=source.height;ctx.drawImage(source,0,0);
+  canvas.width=source.width;canvas.height=source.height;ctx.drawImage(source,0,0);layout();
   $('compare').setAttribute('aria-pressed',String(before&&Boolean(rendered)));
   drawOverlay();
 }
@@ -106,6 +113,7 @@ $('reset').onclick=()=>{clearTimeout(renderTimer);renderId++;resetValues();cropM
 
 // Press and hold the photo to peek at the original.
 const stage=$('stage');
+new ResizeObserver(()=>{layout();drawOverlay();}).observe(stage);
 stage.addEventListener('pointerdown',e=>{if(!rendered||busy||e.target.closest('button'))return;holdBefore=true;draw();});
 for(const type of ['pointerup','pointercancel','pointerleave'])stage.addEventListener(type,()=>{if(!holdBefore)return;holdBefore=false;draw();});
 stage.addEventListener('contextmenu',e=>e.preventDefault());
@@ -152,7 +160,6 @@ async function save(format){
     status(`Saved ${c.width} x ${c.height}`);
   }catch(e){status(e.message,true);}finally{setBusy(false);}
 }
-new ResizeObserver(drawOverlay).observe(canvas);
 if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});let hadController=Boolean(navigator.serviceWorker.controller);navigator.serviceWorker.addEventListener('controllerchange',()=>{if(hadController&&!original)location.reload();hadController=true;});}
 syncCrop();
 try{await rpc('init');}catch(e){status(e.message,true);}finally{setBusy(false);}
