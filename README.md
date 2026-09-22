@@ -4,6 +4,7 @@ A mobile-first, installable photo toolkit. Source: https://github.com/FelineStat
 
 Tools:
 
+- `/fuji`: extracts the in-camera JPEG from a Fujifilm RAF byte for byte, shows the film simulation and camera from its EXIF, and saves or shares it. Pure JavaScript, no decoding of raw sensor data.
 - `/perspective`: straightens converging verticals and horizontals using darktable's C algorithms (LSD line detection, RANSAC, perspective fit, homography) compiled to WebAssembly.
 
 ## Run
@@ -43,6 +44,7 @@ The config serves only `dist/`; it has no backend, secrets, storage bindings, an
 ## Layout
 
 - `index.html` + `home.mjs`: landing grid of tools, install and about.
+- `fuji.html` + `fuji.mjs` + `raf.mjs`: the Fuji tool. `raf.mjs` parses the RAF container and the Fuji makernote.
 - `perspective.html` + `app.mjs`: the perspective tool UI. `worker.mjs` runs the WebAssembly core off the main thread.
 - `style.css`: shared styles. Dark, system font, safe-area aware; the tool page never scrolls.
 

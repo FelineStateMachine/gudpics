@@ -8,6 +8,7 @@
     {"src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
   ],
   "shortcuts": [
-    {"name": "Perspective", "url": "./perspective", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]}
+    {"name": "Perspective", "url": "./perspective", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Fuji", "url": "./fuji", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]}
   ]
 }

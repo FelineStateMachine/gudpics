@@ -6,7 +6,7 @@ import shutil, hashlib
 root=Path(__file__).resolve().parent.parent
 dist=root/'dist'
 dist.mkdir(exist_ok=True)
-public=['index.html','perspective.html','style.css','viewport.js','home.mjs','app.mjs','worker.mjs','geometry.mjs','manifest.webmanifest','NOTICE.md','README.md','_headers']
+public=['index.html','perspective.html','fuji.html','style.css','viewport.js','home.mjs','app.mjs','fuji.mjs','raf.mjs','worker.mjs','geometry.mjs','manifest.webmanifest','NOTICE.md','README.md','_headers']
 for f in public: shutil.copyfile(root/f,dist/f)
 for d in ['assets','LICENSES']: shutil.copytree(root/d,dist/d,dirs_exist_ok=True)
 digest=hashlib.sha256()

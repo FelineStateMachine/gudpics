@@ -231,6 +231,14 @@ input[type=range]::-moz-range-thumb { width: 26px; height: 26px; border: 0; bord
 .tb[aria-pressed="true"]:not(:disabled) { color: var(--tint); }
 .tb svg { width: 26px; height: 26px; }
 
+/* ---------- Fuji ---------- */
+
+#photo { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+.facts { margin: 0; display: grid; gap: 2px; }
+.facts div { display: flex; justify-content: space-between; gap: 12px; min-height: 30px; align-items: center; font-size: 14px; }
+.facts dt { color: var(--label-2); }
+.facts dd { margin: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
 /* ---------- Sheets ---------- */
 
 dialog.sheet {
