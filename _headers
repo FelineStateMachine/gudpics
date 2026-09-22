@@ -9,6 +9,9 @@
 /*.mjs
   Content-Type: text/javascript
 
+/*.js
+  Content-Type: text/javascript
+
 /sw.js
   Cache-Control: no-cache
 
