@@ -14,7 +14,7 @@ if dist.exists(): shutil.rmtree(dist)
 
 # Hashed files in dependency order: leaves first, so a file's hash covers its rewritten references.
 LUTS = sorted(p.relative_to(root).as_posix() for p in (root / 'assets' / 'luts').glob('*.png'))
-HASHED = ['assets/core.wasm', 'assets/core.mjs', 'assets/raw.wasm', 'assets/raw.mjs'] + LUTS + ['geometry.mjs', 'worker.mjs', 'app.mjs', 'raf.mjs', 'rawworker.mjs', 'fuji.mjs', 'home.mjs', 'viewport.js', 'style.css']
+HASHED = ['assets/core.wasm', 'assets/core.mjs', 'assets/raw.wasm', 'assets/raw.mjs'] + LUTS + ['geometry.mjs', 'worker.mjs', 'app.mjs', 'raf.mjs', 'lens.mjs', 'rawworker.mjs', 'fuji.mjs', 'home.mjs', 'viewport.js', 'style.css']
 # Fixed-name text files that reference hashed ones.
 PAGES = ['index.html', 'perspective.html', 'fuji.html']
 FIXED = ['manifest.webmanifest', 'NOTICE.md', 'README.md', '_headers']

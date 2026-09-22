@@ -32,7 +32,7 @@ function layout(){
   }
 }
 new ResizeObserver(layout).observe(stageEl);photo.addEventListener('load',layout);
-let current=null,busy=false,toastTimer,sim='provia',dr=100,showCamera=false,holdCamera=false,renderId=0,cameraUrl=null;
+let current=null,busy=false,toastTimer,sim='provia',dr=100,showCamera=false,holdCamera=false,renderId=0,cameraUrl=null,lensOn=true;
 const loaded=new Set(),loading=new Map();
 
 function status(message,error=false){clearTimeout(toastTimer);const el=$('status');el.textContent=message;el.classList.toggle('error',error);el.hidden=!message;if(message)toastTimer=setTimeout(()=>{el.hidden=true;},error?5000:2500);}
@@ -40,6 +40,7 @@ function sync(){
   tool.dataset.state=current?'detected':'empty';
   $('save').disabled=!current||busy;$('share').disabled=!current||busy;$('open').disabled=busy;$('open-empty').disabled=busy;$('compare').disabled=!current||!current.camera;
   $('busy').hidden=!busy;
+  $('lens').disabled=!current?.info.lens||busy;$('lens').setAttribute('aria-pressed',String(lensOn&&Boolean(current?.info.lens)));
   for(const b of $('sims').children){b.setAttribute('aria-checked',String(b.dataset.sim===sim));b.disabled=!current||busy;}
   const cam=(showCamera||holdCamera)&&current?.camera;
   canvas.hidden=Boolean(cam);photo.hidden=!cam;$('compare').setAttribute('aria-pressed',String(Boolean(cam)));
@@ -70,12 +71,12 @@ async function openFile(file){
   try{
     if(file.size>200*1024*1024)throw Error('Choose a RAF smaller than 200 MB.');
     const buffer=await file.arrayBuffer();
-    let camera=null,shot='';
-    try{const r=parseRaf(buffer.slice(0));camera=new Blob([r.jpeg],{type:'image/jpeg'});shot=r.simulation;}catch{}
-    const info=await rpc('open',{buffer},[buffer]);
+    let camera=null,shot='',cropf=1;
+    try{const r=parseRaf(buffer.slice(0));camera=new Blob([r.jpeg],{type:'image/jpeg'});shot=r.simulation;if(r.cropMode===2||r.cropMode===4)cropf=1.25;}catch{}
+    const info=await rpc('open',{buffer,cropf},[buffer]);
     if(cameraUrl)URL.revokeObjectURL(cameraUrl);cameraUrl=camera?URL.createObjectURL(camera):null;photo.src=cameraUrl||'';
     current={name:file.name.replace(/\.[^.]+$/,''),camera,info};
-    dr=[100,200,400].includes(info.dr)?info.dr:100;sim=FROM_CAMERA[shot]||'provia';showCamera=false;
+    dr=[100,200,400].includes(info.dr)?info.dr:100;sim=FROM_CAMERA[shot]||'provia';showCamera=false;lensOn=true;
     $('info').textContent=[info.model,shot,dr!==100?'DR'+dr:''].filter(Boolean).join('  ');$('info').hidden=false;
     sync();await render();
   }catch(e){status(e.message||'Could not read this file.',true);}
@@ -93,6 +94,7 @@ stage.addEventListener('contextmenu',e=>e.preventDefault());
 stage.addEventListener('pointerdown',e=>{if(!current?.camera||busy||e.target.closest('button'))return;holdCamera=true;sync();});
 for(const t of ['pointerup','pointercancel','pointerleave'])stage.addEventListener(t,()=>{if(!holdCamera)return;holdCamera=false;sync();});
 $('compare').onclick=()=>{showCamera=!showCamera;sync();};
+$('lens').onclick=async()=>{lensOn=!lensOn;sync();try{await rpc('lens',{on:lensOn});await render();}catch(e){status(e.message,true);}};
 // Save
 const saveSheet=$('save-sheet');for(const b of saveSheet.querySelectorAll('[data-close]'))b.onclick=()=>saveSheet.close();saveSheet.addEventListener('click',e=>{if(e.target===saveSheet)saveSheet.close();});
 $('save').onclick=()=>saveSheet.showModal();

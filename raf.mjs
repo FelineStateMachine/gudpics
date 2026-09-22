@@ -14,7 +14,7 @@ export function parseRaf(buffer){
 const FILM={0:'Provia',0x100:'Studio Portrait',0x110:'Studio Portrait Enhanced',0x120:'Astia',0x130:'Studio Portrait Sharp',0x200:'Velvia',0x300:'Studio Portrait Ex',0x400:'Velvia',0x500:'Pro Neg. Std',0x501:'Pro Neg. Hi',0x600:'Classic Chrome',0x700:'Eterna',0x800:'Classic Neg.',0x900:'Eterna Bleach Bypass',0xa00:'Nostalgic Neg.',0xb00:'Reala Ace'};
 const MONO={0x300:'Monochrome',0x301:'Monochrome+R',0x302:'Monochrome+Ye',0x303:'Monochrome+G',0x310:'Sepia',0x500:'Acros',0x501:'Acros+R',0x502:'Acros+Ye',0x503:'Acros+G'};
 function readExif(jpeg){
-  const out={simulation:'',camera:'',width:0,height:0,date:''};
+  const out={simulation:'',camera:'',width:0,height:0,date:'',cropMode:0};
   try{
     const v=new DataView(jpeg.buffer,jpeg.byteOffset,jpeg.byteLength);
     let p=2;
@@ -43,6 +43,6 @@ function parseTiff(t,out){
   const m=new DataView(t.buffer,t.byteOffset+maker,makerLen);
   const mo=m.getUint32(8,true),n=m.getUint16(mo,true);
   let film=0,mono=-1;
-  for(let i=0;i<n;i++){const e=mo+2+i*12,tag=m.getUint16(e,true),type=m.getUint16(e+2,true);const val=type===3?m.getUint16(e+8,true):m.getUint32(e+8,true);if(tag===0x1401)film=val;if(tag===0x1003)mono=val;}
+  for(let i=0;i<n;i++){const e=mo+2+i*12,tag=m.getUint16(e,true),type=m.getUint16(e+2,true);const val=type===3?m.getUint16(e+8,true):m.getUint32(e+8,true);if(tag===0x1401)film=val;if(tag===0x1003)mono=val;if(tag===0x104d)out.cropMode=val;}
   out.simulation=MONO[mono]||FILM[film]||'';
 }

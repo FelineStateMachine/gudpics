@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Develops Fujifilm RAF files with LibRaw and applies film simulation LUTs off the main thread.
 import createRaw from './assets/raw.mjs';
+import {parseLens,lensTables,correctLens} from './lens.mjs';
 const corePromise=createRaw();
 const N=33; // neutral LUT grid
-let full=null,preview=null; // {w,h,rgb:Uint8Array}
+let developed=null,corrected=null,full=null,preview=null,lens=null; // {w,h,rgb:Uint8Array}
 let luts={neutral:{},sim:{}}; // decoded LUT tables: neutral[dr] = Uint8Array(N^3*3), sim[name] = Uint8Array(16^3*3)
 let composed=new Map(); // key dr:sim -> Uint8Array(N^3*3)
 
@@ -48,8 +49,14 @@ function render(img,table){
   }
   return {w,h,data:out};
 }
-async function open(buffer){
+function select(useLens){
+  full=useLens&&corrected?corrected:developed;
+  const factor=Math.max(1,Math.ceil(Math.max(full.w,full.h)/1600));
+  preview=factor>1?downscale(full.rgb,full.w,full.h,factor):full;
+}
+async function open(buffer,cropf){
   const core=await corePromise;
+  const params=parseLens(buffer);
   const p=core._malloc(buffer.byteLength);if(!p)throw Error('Not enough memory for this file.');
   core.HEAPU8.set(new Uint8Array(buffer),p);
   try{
@@ -58,19 +65,22 @@ async function open(buffer){
     if(!/fuji/i.test(info.make))throw Error('Only Fujifilm RAF files are supported.');
     r=core._raw_develop(1,1,1,8);if(r)throw Error('Developing failed.');
     const w=core._raw_out_width(),h=core._raw_out_height(),d=core._raw_data();
-    full={w,h,rgb:core.HEAPU8.slice(d,d+w*h*3)};
-    const factor=Math.max(1,Math.ceil(Math.max(w,h)/1600));
-    preview=factor>1?downscale(full.rgb,w,h,factor):full;
+    developed={w,h,rgb:core.HEAPU8.slice(d,d+w*h*3)};
+    lens=params?lensTables(params,cropf,w/h):null;
+    corrected=lens&&(lens.hasDist||lens.hasVig)?correctLens(developed,lens):null;
+    info.lens=Boolean(corrected);
+    select(true);
     return info;
   }finally{core._raw_free();core._free(p);}
 }
 self.onmessage=async({data})=>{
   try{
     let result,transfer=[];
-    if(data.type==='open'){result=await open(data.buffer);}
+    if(data.type==='open'){result=await open(data.buffer,data.cropf||1);}
+    else if(data.type==='lens'){select(data.on);result={ok:true};}
     else if(data.type==='lut'){luts[data.kind][data.name]=data.table;composed.clear();result={ok:true};}
     else if(data.type==='render'){const img=data.full?full:preview;if(!img)throw Error('Open a RAF first.');result=render(img,compose(data.dr,data.sim));transfer=[result.data.buffer];}
-    else if(data.type==='close'){full=preview=null;result={ok:true};}
+    else if(data.type==='close'){developed=corrected=full=preview=null;result={ok:true};}
     else throw Error('Unknown operation.');
     self.postMessage({id:data.id,result},transfer);
   }catch(e){self.postMessage({id:data.id,error:e.message||'Could not process this file.'});}
