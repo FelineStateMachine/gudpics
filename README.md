@@ -5,7 +5,7 @@ A mobile-first, installable photo toolkit. Source: https://github.com/FelineStat
 Tools:
 
 - `/fuji`: develops a Fujifilm RAF in the browser with LibRaw (WebAssembly) and applies any of 16 film simulation looks via 3D LUTs, then saves a JPEG. The in-camera JPEG can be viewed and saved too. See NOTICE.md for where the LUTs come from and how close they are.
-- `/social`: crop to post formats (square, 4:5, 9:16, 16:9, 1.91:1, 3:2) or pad out, drag to position, frame in white or black, vignette and grain, then save or share a JPEG at the platform size.
+- `/social`: crop to an aspect ratio (1:1, photo 5:4 4:3 3:2, social 4:5 9:16 1.91:1, each rotatable) or pad out, drag to position, frame in white or black, vignette and grain, then save or share a JPEG at the platform size.
 - `/perspective`: straightens converging verticals and horizontals using darktable's C algorithms (LSD line detection, RANSAC, perspective fit, homography) compiled to WebAssembly.
 
 ## Run

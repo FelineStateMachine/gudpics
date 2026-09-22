@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 const $=id=>document.getElementById(id);
-// Formats: ratio null keeps the original; size is the export size for platform presets.
-const FORMATS=[
-  ['original','Original',null,null],['square','Square',1,[1080,1080]],['post','Post 4:5',4/5,[1080,1350]],
-  ['story','Story 9:16',9/16,[1080,1920]],['wide','Wide 16:9',16/9,[1920,1080]],['landscape','Post 1.91:1',1.91,[1080,566]],['classic','Classic 3:2',3/2,null]];
+// Ratios as [long, short], grouped and sorted. Social ratios export with a 1080 short side; photo ratios keep resolution.
+const GROUPS=[
+  ['',[['original','Original',null],['1:1','1:1',[1,1]]]],
+  ['Photo',[['5:4','5:4',[5,4]],['4:3','4:3',[4,3]],['3:2','3:2',[3,2]]]],
+  ['Social',[['5:4s','5:4',[5,4]],['16:9','16:9',[16,9]],['1.91:1','1.91:1',[1.91,1]]]]];
+const FORMATS=GROUPS.flatMap(([group,items])=>items.map(([id,label,ratio])=>[id,label,ratio,group]));
 const MAX_EDGE=2160,PREVIEW_EDGE=1400;
 const tool=$('tool'),canvas=$('canvas'),ctx=canvas.getContext('2d'),stage=$('stage');
-let source=null,name='photo',busy=false,toastTimer,format='original',fit='crop',dark=false,pan={x:0,y:0},dragging=null,renderTimer;
+let source=null,name='photo',busy=false,toastTimer,format='original',fit='crop',dark=false,pan={x:0,y:0},dragging=null,renderTimer,portrait=false;
+function ratioOf(f){if(!f[2])return null;const [a,b]=f[2];return portrait?b/a:a/b;}
+function labelOf(f){if(!f[2])return f[1];const [a,b]=f[2];return a===b?f[1]:(portrait?`${b}:${a}`:`${a}:${b}`);}
 // One large noise tile drawn at 1:1 so grain is pixel sized and never resampled.
 const NOISE=1024;const noise=(()=>{const c=document.createElement('canvas');c.width=c.height=NOISE;const x=c.getContext('2d'),d=x.createImageData(NOISE,NOISE);let s=1234567;for(let i=0;i<d.data.length;i+=4){s=(s*1664525+1013904223)>>>0;const v=(s>>>8)&255;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255;}x.putImageData(d,0,0);return c;})();
 
@@ -16,7 +20,8 @@ function sync(){
   const ready=Boolean(source)&&!busy;
   for(const id of ['save','share','color','reset','frame','vignette','grain'])$(id).disabled=!ready;
   $('open').disabled=busy;$('open-empty').disabled=busy;$('busy').hidden=!busy;
-  for(const b of $('formats').children){b.setAttribute('aria-checked',String(b.dataset.format===format));b.disabled=!ready;}
+  for(const b of $('formats').querySelectorAll('.chip-list .chip-btn')){const f=FORMATS.find(f=>f[0]===b.dataset.format);b.textContent=labelOf(f);b.setAttribute('aria-checked',String(b.dataset.format===format));b.disabled=!ready;}
+  const cur=FORMATS.find(f=>f[0]===format);$('rotate').disabled=!ready||!cur[2]||cur[2][0]===cur[2][1];
   for(const b of $('fit').children){b.setAttribute('aria-pressed',String(b.dataset.fit===fit));b.disabled=!ready||format==='original';}
   $('color').setAttribute('aria-pressed',String(dark));
   $('frame-value').value=$('frame').value+'%';$('vignette-value').value=$('vignette').value;$('grain-value').value=$('grain').value;
@@ -29,9 +34,9 @@ function layout(){
 new ResizeObserver(layout).observe(stage);
 // Output geometry: returns {w,h, sx,sy,sw,sh (source crop), dx,dy,dw,dh (placement)} for a given long edge budget.
 function geometry(maxEdge,fixed){
-  const f=FORMATS.find(f=>f[0]===format),ratio=f[2],size=f[3],sw0=source.width,sh0=source.height;
+  const f=FORMATS.find(f=>f[0]===format),ratio=ratioOf(f),sw0=source.width,sh0=source.height;
   let w,h;
-  if(fixed&&size){[w,h]=size;}
+  if(fixed&&f[3]==='Social'){const short=1080;[w,h]=ratio>=1?[Math.round(short*ratio),short]:[short,Math.round(short/ratio)];}
   else{
     const r=ratio||sw0/sh0;
     if(fit==='pad'&&ratio){const contained=sw0/sh0>r?[sw0,Math.round(sw0/r)]:[Math.round(sh0*r),sh0];[w,h]=contained;}
@@ -79,17 +84,22 @@ async function openFile(file){
   try{
     if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw Error('Choose a JPEG, PNG or WebP.');
     const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});
-    source?.close?.();source=bitmap;name=file.name.replace(/\.[^.]+$/,'');pan={x:0,y:0};
+    source?.close?.();source=bitmap;name=file.name.replace(/\.[^.]+$/,'');pan={x:0,y:0};portrait=bitmap.height>bitmap.width;
     status('');render();
   }catch(e){status(e.message||'Could not open this image.',true);}
   finally{busy=false;sync();}
 }
 // Controls
-for(const [id,label] of FORMATS){const b=document.createElement('button');b.className='chip-btn';b.role='radio';b.dataset.format=id;b.textContent=label;b.disabled=true;b.onclick=()=>{format=id;pan={x:0,y:0};scheduleRender();b.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});};$('formats').append(b);}
+const list=$('formats').querySelector('.chip-list');
+for(const [group,items] of GROUPS){
+  if(group){const l=document.createElement('span');l.className='chip-group';l.textContent=group;list.append(l);}
+  for(const [id,label] of items){const b=document.createElement('button');b.className='chip-btn';b.role='radio';b.dataset.format=id;b.textContent=label;b.disabled=true;b.onclick=()=>{format=id;pan={x:0,y:0};scheduleRender();b.scrollIntoView({inline:'nearest',block:'nearest',behavior:'smooth'});};list.append(b);}
+}
+$('rotate').onclick=()=>{portrait=!portrait;pan={x:0,y:0};scheduleRender();};
 for(const b of $('fit').children)b.onclick=()=>{fit=b.dataset.fit;scheduleRender();};
 for(const id of ['frame','vignette','grain'])$(id).oninput=scheduleRender;
 $('color').onclick=()=>{dark=!dark;scheduleRender();};
-$('reset').onclick=()=>{format='original';fit='crop';dark=false;pan={x:0,y:0};$('frame').value=0;$('vignette').value=0;$('grain').value=0;scheduleRender();};
+$('reset').onclick=()=>{format='original';fit='crop';dark=false;pan={x:0,y:0};portrait=source?source.height>source.width:false;$('frame').value=0;$('vignette').value=0;$('grain').value=0;scheduleRender();};
 $('file').onchange=()=>{const f=$('file').files[0];if(f)openFile(f);$('file').value='';};
 $('open').onclick=()=>$('file').click();$('open-empty').onclick=()=>$('file').click();
 // Drag to position the crop.
