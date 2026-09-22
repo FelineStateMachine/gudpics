@@ -39,7 +39,7 @@ npx wrangler@4 deploy --dry-run
 npx wrangler@4 deploy
 ```
 
-The config serves only `dist/`; it has no backend, secrets, storage bindings, analytics, photo upload endpoint, or runtime npm dependencies. Re-run packaging after changes: the service-worker version derives from the bundled files. Existing open tabs finish using their cached version; close all app tabs and reopen to activate an update.
+The config serves only `dist/`; it has no backend, secrets, storage bindings, analytics, photo upload endpoint, or runtime npm dependencies. Packaging writes scripts, styles and wasm to `dist/static/` under content-hashed names and rewrites references, so hashed files are cached forever while pages are fetched network-first. Re-run packaging after changes. Existing open tabs finish using their cached version; close all app tabs and reopen to activate an update.
 
 ## Layout
 

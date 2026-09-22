@@ -3,7 +3,10 @@
   Referrer-Policy: no-referrer
   Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
 
-/assets/core.wasm
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.wasm
   Content-Type: application/wasm
 
 /*.mjs
@@ -13,6 +16,18 @@
   Content-Type: text/javascript
 
 /sw.js
+  Cache-Control: no-cache
+
+/*.html
+  Cache-Control: no-cache
+
+/
+  Cache-Control: no-cache
+
+/perspective
+  Cache-Control: no-cache
+
+/fuji
   Cache-Control: no-cache
 
 /manifest.webmanifest
