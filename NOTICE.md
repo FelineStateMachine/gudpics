@@ -1,0 +1,31 @@
+# gud.pics — source, licenses, and changes
+
+Independent browser prototype. Not affiliated with or endorsed by darktable or Adobe.
+
+## Source provenance
+
+Vendored darktable revision: `0286264e169eec79ce8d3744d6e477dcb18d9d94`.
+Repository: https://github.com/darktable-org/darktable
+
+- `native/upstream/ashift.c`: darktable developers, GPL-3.0-or-later.
+- `native/upstream/ashift_lsd.c`: darktable integration, GPL-3.0-or-later; embedded LSD 1.6 by Rafael Grompone von Gioi et al., AGPL-3.0-or-later.
+- `native/upstream/ashift_nmsimplex.c`: darktable integration, GPL-3.0-or-later; embedded Nelder–Mead implementation by Michael F. Hutt, MIT-style permission notice retained in full.
+- Emscripten-generated runtime: Emscripten authors, MIT / University of Illinois/NCSA; see `LICENSES/EMSCRIPTEN.txt`.
+- New adapter, browser code, crop algorithm, and build scripts: AGPL-3.0-or-later. Provided without warranty.
+
+Original notices are retained in the source. Both GPL and AGPL license texts are supplied. GPLv3 §13 and AGPLv3 §13 address their combination. The public repository at https://github.com/FelineStateMachine/gudpics contains the preferred editable forms and build instructions; keep it available when distributing this combined work. No paid or proprietary assets are used.
+
+## Extraction changes (2026-09-21)
+
+`scripts/extract.py` reproducibly selects darktable's original constants, line classification, vector helpers, homography, RANSAC, model fitness and Nelder–Mead fit from the pinned source. It uses the original LSD detector and simplex implementation.
+
+Changes: remove GTK, image pipeline and OpenMP dependencies; supply portable math helpers; keep minimal fit state behind a C API; accept display-referred RGBA rather than RAW; omit the optional detail and edge enhancement preprocessing; replace darktable logging in LSD with stderr. Keep one/two-line selections when RANSAC is skipped. Seed RANSAC deterministically. Add input and finite-result checks at the browser boundary. The generic 28 mm lens model is used, without EXIF focal-length inference.
+
+Browser preview/export uses a new inverse-mapped bilinear renderer. Automatic crop uses a new conservative polygon scan; it does not reproduce darktable's crop optimizer. Analysis is limited to 960 pixels on the long edge; export to 2560 pixels and 4 megapixels. The browser supplies decoding, orientation, and canvas color conversion. Results are not claimed to be pixel-identical to darktable or Lightroom.
+
+## Source references
+
+- Module: https://github.com/darktable-org/darktable/blob/0286264e169eec79ce8d3744d6e477dcb18d9d94/src/iop/ashift.c
+- Detector: https://github.com/darktable-org/darktable/blob/0286264e169eec79ce8d3744d6e477dcb18d9d94/src/iop/ashift_lsd.c
+- Optimizer: https://github.com/darktable-org/darktable/blob/0286264e169eec79ce8d3744d6e477dcb18d9d94/src/iop/ashift_nmsimplex.c
+- Manual: https://darktable-org.github.io/dtdocs/en/module-reference/processing-modules/rotate-perspective/

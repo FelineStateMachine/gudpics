@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Photo tools that run on your phone. Nothing is uploaded.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="gud.pics">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="stylesheet" href="./style.css">
+  <title>gud.pics</title>
+</head>
+<body>
+  <main class="home">
+    <h1 class="home-title">gud.pics</h1>
+
+    <ul class="tools">
+      <li>
+        <a class="tool-card" href="./perspective">
+          <svg viewBox="0 0 160 96" aria-hidden="true">
+            <path d="M42 14 L118 14 L138 82 L22 82 Z" fill="none" stroke="#5e5e5e" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M60 14 L100 14 M52 40 L108 40 M46 62 L114 62" stroke="#5e5e5e" stroke-width="3" stroke-linecap="round"/>
+            <rect x="42" y="14" width="76" height="68" rx="3" fill="none" stroke="#f0c04a" stroke-width="4"/>
+            <path d="M42 40 L118 40 M42 62 L118 62" stroke="#f0c04a" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <h2>Perspective</h2>
+        </a>
+      </li>
+    </ul>
+
+    <section class="list" aria-label="App">
+      <div class="rows">
+        <button class="row" id="install" hidden>Install<svg class="chev" width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="row" id="install-ios" hidden>Add to Home Screen<svg class="chev" width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="row" id="about">About<svg class="chev" width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <a class="row" href="https://github.com/FelineStateMachine/gudpics" target="_blank" rel="noopener">Source<svg class="chev" width="8" height="14" viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="info" class="sheet" aria-labelledby="info-title">
+    <div class="sheet-body" tabindex="-1" autofocus>
+      <div class="grabber"></div>
+      <div class="sheet-head"><h2 id="info-title">About</h2><button class="sheet-close" id="close-info">Done</button></div>
+      <p>Runs on your device. Nothing is uploaded. <span id="offline-status"></span></p>
+      <p>JPEG and PNG, up to 4 MP and 2560 px. Saved copies drop EXIF and color profiles.</p>
+      <h3>Install</h3>
+      <p id="install-help">iPhone: Safari, Share, Add to Home Screen. Android: Install app.</p>
+      <h3>Credits</h3>
+      <p>Built on darktable's perspective code, compiled to WebAssembly. Independent, not affiliated.</p>
+      <div class="links"><a href="https://github.com/FelineStateMachine/gudpics" target="_blank" rel="noopener">Source</a><a href="./NOTICE.md">Notice</a><a href="./LICENSES/AGPL-3.0.txt">AGPL</a><a href="./LICENSES/GPL-3.0.txt">GPL</a></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="./home.mjs"></script>
+</body>
+</html>
