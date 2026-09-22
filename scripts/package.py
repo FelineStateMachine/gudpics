@@ -14,9 +14,9 @@ if dist.exists(): shutil.rmtree(dist)
 
 # Hashed files in dependency order: leaves first, so a file's hash covers its rewritten references.
 LUTS = sorted(p.relative_to(root).as_posix() for p in (root / 'assets' / 'luts').glob('*.png'))
-HASHED = ['assets/core.wasm', 'assets/core.mjs', 'assets/raw.wasm', 'assets/raw.mjs'] + LUTS + ['geometry.mjs', 'worker.mjs', 'app.mjs', 'raf.mjs', 'lens.mjs', 'rawworker.mjs', 'fuji.mjs', 'social.mjs', 'home.mjs', 'viewport.js', 'style.css']
+HASHED = ['assets/core.wasm', 'assets/core.mjs', 'assets/raw.wasm', 'assets/raw.mjs'] + LUTS + ['geometry.mjs', 'worker.mjs', 'app.mjs', 'raf.mjs', 'lens.mjs', 'rawworker.mjs', 'fuji.mjs', 'social.mjs', 'elaworker.mjs', 'ela.mjs', 'home.mjs', 'viewport.js', 'style.css']
 # Fixed-name text files that reference hashed ones.
-PAGES = ['index.html', 'perspective.html', 'fuji.html', 'social.html']
+PAGES = ['index.html', 'perspective.html', 'fuji.html', 'social.html', 'ela.html']
 FIXED = ['manifest.webmanifest', 'NOTICE.md', 'README.md', '_headers']
 DIRS = ['LICENSES']
 ICONS = ['assets/icon.svg', 'assets/icon-192.png', 'assets/icon-512.png']
@@ -53,7 +53,7 @@ for d in DIRS: shutil.copytree(root / d, dist / d)
 for src in ICONS: shutil.copyfile(root / src, dist / src)
 
 # Service worker: precache list and a cache name derived from everything in dist.
-precache = ['./', './perspective', './fuji', './social'] + ['./' + v for v in mapping.values()] + ['./' + f for f in ['manifest.webmanifest', 'NOTICE.md'] + ICONS] + ['./LICENSES/' + p.name for p in sorted((root / 'LICENSES').iterdir()) if p.is_file()]
+precache = ['./', './perspective', './fuji', './social', './ela'] + ['./' + v for v in mapping.values()] + ['./' + f for f in ['manifest.webmanifest', 'NOTICE.md'] + ICONS] + ['./LICENSES/' + p.name for p in sorted((root / 'LICENSES').iterdir()) if p.is_file()]
 h = hashlib.sha256()
 for p in sorted(dist.rglob('*')):
     if p.is_file(): h.update(p.read_bytes())

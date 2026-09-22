@@ -6,6 +6,7 @@ Tools:
 
 - `/fuji`: develops a Fujifilm RAF in the browser with LibRaw (WebAssembly) and applies any of 16 film simulation looks via 3D LUTs, then saves a JPEG. The in-camera JPEG can be viewed and saved too. See NOTICE.md for where the LUTs come from and how close they are.
 - `/social`: crop to an aspect ratio (1:1, photo 5:4 4:3 3:2, social 4:5 9:16 1.91:1, each rotatable) or pad out, drag to position, frame in white or black, vignette and grain, then save or share a JPEG at the platform size.
+- `/ela`: error level analysis. Re-saves the picture as JPEG at a chosen quality, amplifies the difference, estimates the source JPEG quality from its quantization table, and saves the map as PNG.
 - `/perspective`: straightens converging verticals and horizontals using darktable's C algorithms (LSD line detection, RANSAC, perspective fit, homography) compiled to WebAssembly.
 
 ## Run
@@ -47,6 +48,7 @@ The config serves only `dist/`; it has no backend, secrets, storage bindings, an
 - `index.html` + `home.mjs`: landing grid of tools, install and about.
 - `fuji.html` + `fuji.mjs` + `rawworker.mjs` + `raf.mjs`: the Fuji tool. `rawworker.mjs` runs LibRaw (`assets/raw.wasm`, built by `native/raw/build.sh`) and the LUTs off the main thread. `raf.mjs` parses the RAF container and the Fuji makernote. `scripts/neutral-lut.py` regenerates the neutral LUTs with darktable-cli.
 - `social.html` + `social.mjs`: the Social tool, canvas only.
+- `ela.html` + `ela.mjs` + `elaworker.mjs`: the ELA tool; re-encoding and differencing run in a worker on an OffscreenCanvas.
 - `perspective.html` + `app.mjs`: the perspective tool UI. `worker.mjs` runs the WebAssembly core off the main thread.
 - `style.css`: shared styles. Dark, system font, safe-area aware; the tool page never scrolls.
 

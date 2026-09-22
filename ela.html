@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, interactive-widget=resizes-content">
+  <script src="./viewport.js"></script>
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="description" content="Error level analysis for JPEGs. Runs on your device.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="gud.pics">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="stylesheet" href="./style.css">
+  <title>ELA</title>
+</head>
+<body class="tool-body">
+  <div class="tool" id="tool" data-state="empty">
+    <header class="nav">
+      <a class="nav-btn" href="./" aria-label="Tools"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <h1 class="nav-title">ELA</h1>
+      <button class="nav-btn" id="save" aria-label="Save" disabled><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5l5 5 5-5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </header>
+
+    <section class="stage" id="stage" aria-label="Analysis">
+      <div class="canvas-wrap"><canvas id="canvas" aria-label="Error level map"></canvas><canvas id="photo" aria-label="Original" hidden></canvas></div>
+      <button class="empty" id="open-empty" aria-label="Open photo">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><path d="m16 16-1.9-1.9"/></svg>
+        <svg class="plus" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 5v18M5 14h18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </button>
+      <div class="hud">
+        <span class="chip" id="info"></span>
+        <button class="compare" id="compare" aria-pressed="false" aria-label="Show original" disabled><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2v16M7 5H3v10h4M13 5h4v10h-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="toast" id="status" role="status" aria-live="polite" hidden></div>
+      <div class="busy" id="busy" hidden><span class="spinner"></span></div>
+    </section>
+
+    <section class="panel" aria-label="Analysis controls">
+      <div class="slider" id="quality-row"><label for="quality">Quality</label><output id="quality-value" for="quality">95</output><input id="quality" type="range" min="50" max="100" value="95" disabled></div>
+      <div class="slider" id="scale-row"><label for="scale">Amplify</label><output id="scale-value" for="scale">15x</output><input id="scale" type="range" min="1" max="50" value="15" disabled></div>
+      <div class="toolbar">
+        <button class="tb" id="open" aria-label="Open"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="10" r="1.8" fill="currentColor"/><path d="M4 17l5-5 4 4 2.5-2.5L20 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+        <button class="tb" id="reset" aria-label="Reset" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="tb" id="share" aria-label="Share" disabled hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </section>
+    <input id="file" type="file" accept="image/jpeg,image/png,image/webp" hidden>
+  </div>
+  <script type="module" src="./ela.mjs"></script>
+</body>
+</html>
