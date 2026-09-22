@@ -4,7 +4,7 @@ A mobile-first, installable photo toolkit. Source: https://github.com/FelineStat
 
 Tools:
 
-- `/fuji`: extracts the in-camera JPEG from a Fujifilm RAF byte for byte, shows the film simulation and camera from its EXIF, and saves or shares it. Pure JavaScript, no decoding of raw sensor data.
+- `/fuji`: develops a Fujifilm RAF in the browser with LibRaw (WebAssembly) and applies any of 16 film simulation looks via 3D LUTs, then saves a JPEG. The in-camera JPEG can be viewed and saved too. See NOTICE.md for where the LUTs come from and how close they are.
 - `/perspective`: straightens converging verticals and horizontals using darktable's C algorithms (LSD line detection, RANSAC, perspective fit, homography) compiled to WebAssembly.
 
 ## Run
@@ -44,7 +44,7 @@ The config serves only `dist/`; it has no backend, secrets, storage bindings, an
 ## Layout
 
 - `index.html` + `home.mjs`: landing grid of tools, install and about.
-- `fuji.html` + `fuji.mjs` + `raf.mjs`: the Fuji tool. `raf.mjs` parses the RAF container and the Fuji makernote.
+- `fuji.html` + `fuji.mjs` + `rawworker.mjs` + `raf.mjs`: the Fuji tool. `rawworker.mjs` runs LibRaw (`assets/raw.wasm`, built by `native/raw/build.sh`) and the LUTs off the main thread. `raf.mjs` parses the RAF container and the Fuji makernote. `scripts/neutral-lut.py` regenerates the neutral LUTs with darktable-cli.
 - `perspective.html` + `app.mjs`: the perspective tool UI. `worker.mjs` runs the WebAssembly core off the main thread.
 - `style.css`: shared styles. Dark, system font, safe-area aware; the tool page never scrolls.
 

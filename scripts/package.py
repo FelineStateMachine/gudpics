@@ -13,7 +13,8 @@ if dist.exists(): shutil.rmtree(dist)
 (dist / 'static').mkdir(parents=True)
 
 # Hashed files in dependency order: leaves first, so a file's hash covers its rewritten references.
-HASHED = ['assets/core.wasm', 'assets/core.mjs', 'geometry.mjs', 'worker.mjs', 'app.mjs', 'raf.mjs', 'fuji.mjs', 'home.mjs', 'viewport.js', 'style.css']
+LUTS = sorted(p.relative_to(root).as_posix() for p in (root / 'assets' / 'luts').glob('*.png'))
+HASHED = ['assets/core.wasm', 'assets/core.mjs', 'assets/raw.wasm', 'assets/raw.mjs'] + LUTS + ['geometry.mjs', 'worker.mjs', 'app.mjs', 'raf.mjs', 'rawworker.mjs', 'fuji.mjs', 'home.mjs', 'viewport.js', 'style.css']
 # Fixed-name text files that reference hashed ones.
 PAGES = ['index.html', 'perspective.html', 'fuji.html']
 FIXED = ['manifest.webmanifest', 'NOTICE.md', 'README.md', '_headers']
@@ -33,10 +34,10 @@ def rewrite(text, at_dir):
 for src in HASHED:
     p = root / src
     data = p.read_bytes()
-    if p.suffix != '.wasm':
+    if p.suffix not in ('.wasm', '.png'):
         text = rewrite(data.decode(), 'static')
-        if src == 'assets/core.mjs':  # emscripten loader refers to its binary by bare name
-            text = text.replace('"core.wasm"', '"' + Path(mapping['assets/core.wasm']).name + '"')
+        if src in ('assets/core.mjs', 'assets/raw.mjs'):  # emscripten loader refers to its binary by bare name
+            wasm = src.replace('.mjs', '.wasm'); text = text.replace('"' + Path(wasm).name + '"', '"' + Path(mapping[wasm]).name + '"')
         data = text.encode()
     name = f'{p.stem}.{digest(data)}{p.suffix}'
     mapping[src] = f'static/{name}'

@@ -234,10 +234,13 @@ input[type=range]::-moz-range-thumb { width: 26px; height: 26px; border: 0; bord
 /* ---------- Fuji ---------- */
 
 #photo { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
-.facts { margin: 0; display: grid; gap: 2px; }
-.facts div { display: flex; justify-content: space-between; gap: 12px; min-height: 30px; align-items: center; font-size: 14px; }
-.facts dt { color: var(--label-2); }
-.facts dd { margin: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px 16px; margin: 0 -16px; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; }
+.chips::-webkit-scrollbar { display: none; }
+.chip-btn { flex: none; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--surface-2); font-size: 14px; font-weight: 500; color: var(--label); white-space: nowrap; scroll-snap-align: center; }
+.chip-btn[aria-checked="true"] { background: var(--tint); color: var(--tint-ink); font-weight: 600; }
+.chip-btn:disabled { color: var(--label-3); }
+.chip-btn:active:not(:disabled) { opacity: .7; }
+.tool[data-state="empty"] .chips { opacity: .4; }
 
 /* ---------- Sheets ---------- */
 
