@@ -21,20 +21,23 @@
     <h1 class="home-title">gud.pics</h1>
 
     <ul class="tools">
-      <li>
-        <a class="tool-card" href="./perspective">
+      <li class="tool-card">
+        <button class="tool-info" data-info="perspective" aria-label="About Perspective"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
+        <a class="tool-link" href="./perspective">
           <span class="tool-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M14 15H9v-5"/><path d="M16 3h5v5"/><path d="M21 3 9 15"/></svg></span>
           <h2>Perspective</h2>
         </a>
       </li>
-      <li>
-        <a class="tool-card" href="./fuji">
+      <li class="tool-card">
+        <button class="tool-info" data-info="fuji" aria-label="About Fuji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
+        <a class="tool-link" href="./fuji">
           <span class="tool-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m14.31 8 5.74 9.94"/><path d="M9.69 8h11.48"/><path d="m7.38 12 5.74-9.94"/><path d="M9.69 16 3.95 6.06"/><path d="M14.31 16H2.83"/><path d="m16.62 12-5.74 9.94"/></svg></span>
           <h2>Fuji</h2>
         </a>
       </li>
-      <li>
-        <a class="tool-card" href="./social">
+      <li class="tool-card">
+        <button class="tool-info" data-info="social" aria-label="About Social"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></button>
+        <a class="tool-link" href="./social">
           <span class="tool-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="M12 9v11"/><path d="M2 9h13a2 2 0 0 1 2 2v9"/></svg></span>
           <h2>Social</h2>
         </a>
@@ -50,6 +53,13 @@
     </section>
   </main>
 
+  <dialog id="tool-sheet" class="sheet" aria-labelledby="tool-title">
+    <div class="sheet-body" tabindex="-1" autofocus>
+      <div class="grabber"></div>
+      <div class="sheet-head"><h2 id="tool-title"></h2><button class="sheet-close" data-close>Done</button></div>
+      <div id="tool-text"></div>
+    </div>
+  </dialog>
   <dialog id="info" class="sheet" aria-labelledby="info-title">
     <div class="sheet-body" tabindex="-1" autofocus>
       <div class="grabber"></div>
