@@ -11,5 +11,6 @@ $('about').onclick=()=>$('info').showModal();
 $('close-info').onclick=()=>$('info').close();
 $('info').onclick=e=>{if(e.target===$('info'))$('info').close();};
 if('serviceWorker'in navigator){
+  let hadController=Boolean(navigator.serviceWorker.controller);navigator.serviceWorker.addEventListener('controllerchange',()=>{if(hadController)location.reload();hadController=true;});
   navigator.serviceWorker.register('./sw.js').then(async()=>{await navigator.serviceWorker.ready;$('offline-status').textContent='Works offline.';}).catch(()=>{});
 }

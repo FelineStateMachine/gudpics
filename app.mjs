@@ -71,7 +71,7 @@ async function detect(){
   try{
     const a=pixels(scaledCanvas(original,960)),start=performance.now();
     const result=await rpc('detect',{...a},[a.pixels.buffer]);
-    lines=result.lines;analysisSize={w:result.w,h:result.h};hasDetected=true;showLines=true;
+    lines=result.lines;analysisSize={w:result.w,h:result.h};hasDetected=true;showLines=true;$('show-lines').checked=true;
     let v=0,h=0,rejected=0,other=0;
     for(let i=4;i<lines.length;i+=6){const t=lines[i];if(!(t&1))other++;else if(!(t&4))rejected++;else if(t&2)v++;else h++;}
     $('line-count').textContent=`${v+h} lines`;
@@ -97,7 +97,8 @@ function scheduleRender(){updateLabels();clearTimeout(renderTimer);renderTimer=s
 
 $('detect').onclick=detect;fitButtons.forEach(b=>b.onclick=()=>fit(Number(b.dataset.mode)));
 $('rotation').oninput=scheduleRender;$('strength').oninput=scheduleRender;
-$('lines').onclick=()=>{showLines=!showLines;syncControls();drawOverlay();};
+function setLines(v){showLines=v;$('show-lines').checked=v;syncControls();drawOverlay();}
+$('lines').onclick=()=>setLines(!showLines);$('show-lines').onchange=()=>setLines($('show-lines').checked);
 $('guides').onclick=()=>{showGuides=!showGuides;syncControls();drawOverlay();};
 $('show-rejected').onchange=drawOverlay;
 $('compare').onclick=()=>{showBefore=!showBefore;draw();};
@@ -115,7 +116,7 @@ stage.addEventListener('dragleave',()=>zone.classList.remove('over'));
 stage.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('over');const file=e.dataTransfer.files[0];if(file)openFile(file);});
 
 // Sheets
-function sheet(id){const d=$(id);d.onclick=e=>{if(e.target===d||e.target.closest('[data-close]'))d.close();};return d;}
+function sheet(id){const d=$(id);for(const b of d.querySelectorAll('[data-close]'))b.onclick=()=>d.close();d.addEventListener('click',e=>{if(e.target===d)d.close();});return d;}
 const cropSheet=sheet('crop-sheet'),saveSheet=sheet('save-sheet'),linesSheet=sheet('lines-sheet');
 function syncCrop(){for(const b of cropSheet.querySelectorAll('[data-crop]'))b.setAttribute('aria-checked',String(b.dataset.crop===cropMode));}
 $('crop').onclick=()=>cropSheet.showModal();
@@ -152,6 +153,6 @@ async function save(format){
   }catch(e){status(e.message,true);}finally{setBusy(false);}
 }
 new ResizeObserver(drawOverlay).observe(canvas);
-if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});let hadController=Boolean(navigator.serviceWorker.controller);navigator.serviceWorker.addEventListener('controllerchange',()=>{if(hadController&&!original)location.reload();hadController=true;});}
 syncCrop();
 try{await rpc('init');}catch(e){status(e.message,true);}finally{setBusy(false);}
