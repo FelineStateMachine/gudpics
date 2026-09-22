@@ -33,6 +33,7 @@ function layout(){
 }
 new ResizeObserver(layout).observe(stageEl);photo.addEventListener('load',layout);
 let current=null,busy=false,toastTimer,sim='provia',dr=100,showCamera=false,holdCamera=false,renderId=0,cameraUrl=null,lensOn=true;
+let exportCache=null,exportTimer,exportKey='';
 const loaded=new Set(),loading=new Map();
 
 function status(message,error=false){clearTimeout(toastTimer);const el=$('status');el.textContent=message;el.classList.toggle('error',error);el.hidden=!message;if(message)toastTimer=setTimeout(()=>{el.hidden=true;},error?5000:2500);}
@@ -64,6 +65,7 @@ async function render(){
     const r=await rpc('render',{dr:NEUTRAL_URLS[dr]?dr:100,sim});
     if(id!==renderId)return;
     canvas.width=r.w;canvas.height=r.h;ctx.putImageData(new ImageData(r.data,r.w,r.h),0,0);layout();
+    scheduleExport();
   }catch(e){status(e.message,true);}
 }
 async function openFile(file){
@@ -100,6 +102,8 @@ const saveSheet=$('save-sheet');for(const b of saveSheet.querySelectorAll('[data
 $('save').onclick=()=>saveSheet.showModal();
 for(const b of saveSheet.querySelectorAll('[data-save]'))b.onclick=()=>{saveSheet.close();save(b.dataset.save);};
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+// The system share sheet must open inside the tap, so the full-size JPEG is prepared ahead of time.
+function scheduleExport(){exportCache=null;clearTimeout(exportTimer);const key=[current?.name,sim,dr,lensOn].join('|');exportTimer=setTimeout(async()=>{try{const r=await developedBlob();if([current?.name,sim,dr,lensOn].join('|')===key){exportCache=r;exportKey=key;}}catch{}},900);}
 async function developedBlob(){
   const r=await rpc('render',{dr:NEUTRAL_URLS[dr]?dr:100,sim,full:true});
   const c=document.createElement('canvas');c.width=r.w;c.height=r.h;c.getContext('2d').putImageData(new ImageData(r.data,r.w,r.h),0,0);
@@ -113,11 +117,13 @@ async function save(what){
   }catch(e){status(e.message,true);}finally{busy=false;sync();}
 }
 if(navigator.canShare&&navigator.share)$('share').hidden=false;
-$('share').onclick=async()=>{
-  if(!current)return;busy=true;sync();
-  try{const {blob}=await developedBlob();const file=new File([blob],`${current.name}-${sim}.jpg`,{type:'image/jpeg'});
-    if(!navigator.canShare({files:[file]}))throw Error('Sharing files is not supported here.');await navigator.share({files:[file]});}
-  catch(e){if(e.name!=='AbortError')status(e.message,true);}finally{busy=false;sync();}
+$('share').onclick=()=>{
+  if(!current)return;
+  const fname=`${current.name}-${sim}.jpg`,ready=exportCache&&exportKey===[current.name,sim,dr,lensOn].join('|');
+  if(!ready){busy=true;sync();developedBlob().then(({blob})=>{download(blob,fname);status('Saved. Share it from your photos.');}).catch(e=>status(e.message,true)).finally(()=>{busy=false;sync();});return;}
+  const file=new File([exportCache.blob],fname,{type:'image/jpeg'});
+  if(!navigator.canShare({files:[file]}))return status('Sharing files is not supported here.',true);
+  navigator.share({files:[file]}).catch(e=>{if(e.name==='AbortError')return;download(exportCache.blob,fname);status('Saved. Share it from your photos.');});
 };
 if('serviceWorker'in navigator){navigator.serviceWorker.register('./sw.js').catch(()=>{});let hadController=Boolean(navigator.serviceWorker.controller);navigator.serviceWorker.addEventListener('controllerchange',()=>{if(hadController&&!current)location.reload();hadController=true;});}
 sync();

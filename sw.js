@@ -2,7 +2,7 @@
 // The cache name and precache list are filled in by scripts/package.py.
 const CACHE='__CACHE__';
 const FILES=[__FILES__];
-const PAGES={'/':'./','/perspective':'./perspective','/fuji':'./fuji'};
+const PAGES={'/':'./','/perspective':'./perspective','/fuji':'./fuji','/social':'./social'};
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)));});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{
