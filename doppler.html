@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, interactive-widget=resizes-content">
+  <script src="./viewport.js"></script>
+  <meta name="theme-color" content="#1a1a1a">
+  <meta name="description" content="Spectrogram of the low tones in a video, with aircraft flyovers marked. Runs on your device.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="gud.pics">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="stylesheet" href="./style.css">
+  <title>Doppler</title>
+</head>
+<body class="tool-body">
+  <div class="tool" id="tool" data-state="empty">
+    <header class="nav">
+      <a class="nav-btn" href="./" aria-label="Tools"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <h1 class="nav-title">Doppler</h1>
+      <button class="nav-btn" id="save" aria-label="Save" disabled><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5l5 5 5-5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </header>
+
+    <section class="stage spectro" id="stage" aria-label="Spectrogram">
+      <div class="canvas-wrap" id="wrap"><canvas id="canvas" aria-label="Spectrogram, 40 to 450 Hz"></canvas></div>
+      <button class="empty" id="open-empty" aria-label="Open video">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2"/></svg>
+        <svg class="plus" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 5v18M5 14h18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </button>
+      <div class="hud">
+        <button class="chip" id="info" aria-label="Next flyover"></button>
+        <button class="compare" id="marks" aria-pressed="true" aria-label="Show flyover marks" disabled><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5h3c4 0 5 10 9 10h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 2.5"/></svg></button>
+      </div>
+      <div class="toast" id="status" role="status" aria-live="polite" hidden></div>
+      <div class="busy" id="busy" hidden><span class="spinner"></span></div>
+    </section>
+
+    <section class="panel" aria-label="Spectrogram controls">
+      <div class="slider"><label for="range">Range</label><output id="range-value" for="range">16 dB</output><input id="range" type="range" min="4" max="40" value="16" disabled></div>
+      <div class="slider"><label for="zoom">Zoom</label><output id="zoom-value" for="zoom"></output><input id="zoom" type="range" min="0" max="1000" value="0" disabled></div>
+      <div class="toolbar">
+        <button class="tb" id="open" aria-label="Open"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="13" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M15.5 10.5l6-3.5v10l-6-3.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+        <button class="tb" id="reset" aria-label="Reset" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="tb" id="share" aria-label="Share" disabled hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </section>
+    <input id="file" type="file" accept="video/*,audio/*" hidden>
+  </div>
+  <script type="module" src="./doppler.mjs"></script>
+</body>
+</html>

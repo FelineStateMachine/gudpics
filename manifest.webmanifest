@@ -11,6 +11,7 @@
     {"name": "Perspective", "url": "./perspective", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]},
     {"name": "Fuji", "url": "./fuji", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]},
     {"name": "Social", "url": "./social", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]},
-    {"name": "ELA", "url": "./ela", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]}
+    {"name": "ELA", "url": "./ela", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Doppler", "url": "./doppler", "icons": [{"src": "assets/icon-192.png", "sizes": "192x192"}]}
   ]
 }

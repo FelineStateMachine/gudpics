@@ -36,5 +36,8 @@
 /ela
   Cache-Control: no-cache
 
+/doppler
+  Cache-Control: no-cache
+
 /manifest.webmanifest
   Content-Type: application/manifest+json
